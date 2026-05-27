@@ -5,114 +5,116 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Button,
 } from "react-native";
 
-export default function HomeScreen({ navigation, route }: any) {
-  // USERNAME
-  const username = route?.params?.username || "Usuario";
+import { signOut } from "firebase/auth";
+import { auth } from "../services/firebaseConfig";
 
-  // ROLE LIMPIO
+export default function HomeScreen({ navigation, route }: any) {
+  const username = route?.params?.username || "Usuario";
   const role = route?.params?.role?.trim().toLowerCase() || "user";
+
+  // ✅ LOGOUT
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
+      
       {/* HEADER */}
       <View style={styles.header}>
+        
+        {/* BOTÓN SIDEBAR */}
+        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+          <Text style={styles.menu}>☰</Text>
+        </TouchableOpacity>
+
         <Text style={styles.title}>🎬 GameStore</Text>
 
         <Text style={styles.subtitle}>
           Bienvenido {username}
         </Text>
 
-        <View style={styles.roleContainer}>
+        <View style={styles.roleBadge}>
           <Text style={styles.roleText}>
             {role === "admin" ? "👑 ADMIN" : "👤 USER"}
           </Text>
         </View>
       </View>
 
-      {/* INFORMACIÓN */}
-      <Text style={styles.text}>Deber sobre navegación</Text>
-      <Text style={styles.text}>
-        Cristian Andres Villacis Mendoza
-      </Text>
-      <Text style={styles.text}>
-        Lenguaje de programación 4
-      </Text>
-      <Text style={styles.text}>React Native</Text>
-
-      {/* MOVIES */}
-      <TouchableOpacity
-        style={styles.card}
-        onPress={() =>
-          navigation.navigate("Movies", {
-            role,
-            username,
-          })
-        }
-      >
-        <Text style={styles.cardTitle}>🎥 Películas</Text>
-        <Text style={styles.cardDescription}>
-          Explora el catálogo de películas
+      {/* CONTENIDO TIPO NOTICIAS */}
+      <View style={styles.bigCard}>
+        <Text style={styles.cardText}>
+          🔥 Promoción de la semana
         </Text>
-      </TouchableOpacity>
-
-      {/* GAMES */}
-      <TouchableOpacity
-        style={styles.card}
-        onPress={() =>
-          navigation.navigate("Games", {
-            role,
-            username,
-          })
-        }
-      >
-        <Text style={styles.cardTitle}>🎮 Videojuegos</Text>
-        <Text style={styles.cardDescription}>
-          Explora el catálogo de videojuegos
-        </Text>
-      </TouchableOpacity>
-
-      {/* PERFIL */}
-      <TouchableOpacity
-        style={styles.profileButton}
-        onPress={() =>
-          navigation.navigate("Profile", {
-            username,
-            role,
-          })
-        }
-      >
-        <Text style={styles.profileButtonText}>
-          Ver Perfil
-        </Text>
-      </TouchableOpacity>
-
-      {/* BOTÓN EXTRA */}
-      <View style={styles.buttonContainer}>
-        <Button
-          title="Ir a Detalle"
-          onPress={() => navigation.navigate("Detail")}
-        />
       </View>
 
-      {/* PANEL ADMIN */}
+      <View style={styles.row}>
+        <View style={styles.smallCard}>
+          <Text style={styles.cardText}>
+            🎮 Nuevo juego disponible
+          </Text>
+        </View>
+
+        <View style={styles.smallCard}>
+          <Text style={styles.cardText}>
+            🎥 Estreno exclusivo
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.bigCard}>
+        <Text style={styles.cardText}>
+          ⭐ Recomendado para ti
+        </Text>
+      </View>
+
+      {/* BOTONES GRANDES */}
+      <TouchableOpacity
+        style={styles.mainButton}
+        onPress={() => navigation.navigate("Movies")}
+      >
+        <Text style={styles.mainButtonText}>
+          🎥 IR A PELÍCULAS
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.mainButton}
+        onPress={() => navigation.navigate("Games")}
+      >
+        <Text style={styles.mainButtonText}>
+          🎮 IR A JUEGOS
+        </Text>
+      </TouchableOpacity>
+
+      {/* ADMIN PANEL */}
       {role === "admin" && (
         <View style={styles.adminPanel}>
           <Text style={styles.adminTitle}>
             🔥 Panel Administrador
           </Text>
 
-          <Text style={styles.permission}>
-            ✅ CRUD Películas
-          </Text>
-
-          <Text style={styles.permission}>
-            ✅ CRUD Videojuegos
-          </Text>
+          <Text style={styles.permission}>✅ CRUD Películas</Text>
+          <Text style={styles.permission}>✅ CRUD Videojuegos</Text>
         </View>
       )}
+
+      {/* LOGOUT */}
+      <TouchableOpacity
+        style={styles.logoutBtn}
+        onPress={handleLogout}
+      >
+        <Text style={styles.logoutText}>
+          🚪 Cerrar sesión
+        </Text>
+      </TouchableOpacity>
+
     </ScrollView>
   );
 }
@@ -120,41 +122,113 @@ export default function HomeScreen({ navigation, route }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#121212",
+    backgroundColor: "#0f172a",
     padding: 20,
   },
 
   header: {
-    marginTop: 50,
-    marginBottom: 40,
+    marginTop: 40,
+    marginBottom: 20,
+  },
+
+  menu: {
+    color: "#fff",
+    fontSize: 28,
+    marginBottom: 10,
   },
 
   title: {
     color: "#fff",
-    fontSize: 34,
+    fontSize: 32,
     fontWeight: "bold",
   },
 
   subtitle: {
-    color: "#aaa",
-    fontSize: 18,
+    color: "#94a3b8",
+    marginTop: 5,
+  },
+
+  roleBadge: {
+    backgroundColor: "#6366f1",
+    padding: 6,
+    borderRadius: 15,
     marginTop: 10,
-  },
-
-  text: {
-    fontSize: 16,
-    color: "#33ff99",
-    marginBottom: 8,
-    textAlign: "center",
-  },
-
-  roleContainer: {
-    backgroundColor: "#7c3aed",
     alignSelf: "flex-start",
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 30,
+  },
+
+  roleText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+
+  bigCard: {
+    backgroundColor: "#1e293b",
+    padding: 25,
+    borderRadius: 20,
+    marginBottom: 15,
+  },
+
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+
+  smallCard: {
+    backgroundColor: "#1e293b",
+    padding: 20,
+    borderRadius: 20,
+    width: "48%",
+    marginBottom: 15,
+  },
+
+  cardText: {
+    color: "#fff",
+  },
+
+  mainButton: {
+    backgroundColor: "#3b82f6",
+    padding: 20,
+    borderRadius: 20,
+    alignItems: "center",
+    marginTop: 15,
+  },
+
+  mainButtonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+
+  adminPanel: {
+    backgroundColor: "#1e293b",
+    padding: 20,
+    borderRadius: 20,
     marginTop: 20,
   },
 
-  });
+  adminTitle: {
+    color: "#f59e0b",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+
+  permission: {
+    color: "#22c55e",
+    marginBottom: 5,
+  },
+
+  logoutBtn: {
+    backgroundColor: "#ef4444",
+    padding: 16,
+    borderRadius: 15,
+    alignItems: "center",
+    marginTop: 20,
+  },
+
+  logoutText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+});

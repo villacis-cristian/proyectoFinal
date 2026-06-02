@@ -4,7 +4,21 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
+
+// ─────────────────────────────────────────
+// SCREEN WIDTH
+// ─────────────────────────────────────────
+const screenWidth =
+  Dimensions.get('window').width;
+
+// ─────────────────────────────────────────
+// CARD WIDTH
+// 2 CARDS POR FILA
+// ─────────────────────────────────────────
+const CARD_WIDTH =
+  (screenWidth / 2) - 24;
 
 export default function MovieCard({
 
@@ -22,36 +36,81 @@ export default function MovieCard({
 
     <View style={styles.card}>
 
-      {/* IMAGEN */}
+      {/* HEADER */}
+      <View style={styles.header}>
+
+        <Text style={styles.player}>
+          ◄ P1 ►
+        </Text>
+
+        <View style={styles.square} />
+
+        <Text style={styles.status}>
+          READY
+        </Text>
+
+      </View>
+
+      {/* IMAGE */}
       <Image
         source={{ uri: movie.image }}
         style={styles.image}
       />
 
-      {/* INFO */}
-      <Text style={styles.title}>
+      {/* TITLE */}
+      <Text
+        numberOfLines={2}
+        style={styles.title}
+      >
         {movie.title}
       </Text>
 
-      <Text style={styles.genre}>
-        🎭 {movie.genre}
+      {/* LINE */}
+      <View style={styles.line} />
+
+      {/* GENRE */}
+      <Text
+        numberOfLines={1}
+        style={styles.genre}
+      >
+        ■ {movie.genre}
       </Text>
 
+      {/* PRICE */}
       <Text style={styles.price}>
-        💲 {movie.price}
+        ▶ ${movie.price}
       </Text>
 
-      <Text style={styles.description}>
+      {/* DESCRIPTION */}
+      <Text
+        numberOfLines={3}
+        style={styles.description}
+      >
         {movie.description}
       </Text>
 
-      {/* BOTONES ADMIN */}
+      {/* FOOTER */}
+      <View style={styles.footer}>
+
+        <Text style={styles.footerText}>
+          ACCESS
+        </Text>
+
+        <Text style={styles.footerText}>
+          LOADING...
+        </Text>
+
+      </View>
+
+      {/* BUTTONS */}
       {role === 'admin' && (
 
         <View style={styles.buttonContainer}>
 
-          {/* EDITAR */}
+          {/* EDIT */}
           <TouchableOpacity
+
+            activeOpacity={0.8}
 
             style={styles.editButton}
 
@@ -59,13 +118,15 @@ export default function MovieCard({
           >
 
             <Text style={styles.buttonText}>
-              Editar
+              EDIT
             </Text>
 
           </TouchableOpacity>
 
-          {/* ELIMINAR */}
+          {/* DELETE */}
           <TouchableOpacity
+
+            activeOpacity={0.8}
 
             style={styles.deleteButton}
 
@@ -73,7 +134,7 @@ export default function MovieCard({
           >
 
             <Text style={styles.buttonText}>
-              Eliminar
+              DEL
             </Text>
 
           </TouchableOpacity>
@@ -87,70 +148,333 @@ export default function MovieCard({
 
 const styles = StyleSheet.create({
 
+  // ───────────────────────────────────────
+  // CARD
+  // ───────────────────────────────────────
   card: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: 20,
-    padding: 15,
-    marginBottom: 20,
+
+    width: CARD_WIDTH,
+
+    backgroundColor: '#2E0246',
+
+    borderWidth: 4,
+
+    borderColor: '#A406F9',
+
+    padding: 10,
+
+    marginBottom: 18,
+
+    marginHorizontal: 6,
+
+    shadowColor: '#000',
+
+    shadowOffset: {
+      width: 6,
+      height: 6,
+    },
+
+    shadowOpacity: 1,
+
+    shadowRadius: 0,
+
+    elevation: 12,
   },
 
-  image: {
-    width: '100%',
-    height: 200,
-    borderRadius: 15,
-    marginBottom: 15,
-  },
+  // ───────────────────────────────────────
+  // HEADER
+  // ───────────────────────────────────────
+  header: {
 
-  title: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-
-  genre: {
-    color: '#aaa',
-    marginTop: 8,
-    fontSize: 16,
-  },
-
-  price: {
-    color: '#4ade80',
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-
-  description: {
-    color: '#ddd',
-    marginTop: 10,
-    fontSize: 15,
-  },
-
-  buttonContainer: {
     flexDirection: 'row',
-    marginTop: 20,
+
+    alignItems: 'center',
+
     justifyContent: 'space-between',
+
+    marginBottom: 8,
   },
 
+  player: {
+
+    color: '#C560FB',
+
+    fontSize: 7,
+
+    fontWeight: '900',
+
+    letterSpacing: 2,
+  },
+
+  square: {
+
+    width: 10,
+
+    height: 10,
+
+    backgroundColor: '#22c55e',
+
+    borderWidth: 2,
+
+    borderColor: '#000',
+  },
+
+  status: {
+
+    color: '#22c55e',
+
+    fontSize: 7,
+
+    fontWeight: '900',
+
+    letterSpacing: 2,
+  },
+
+  // ───────────────────────────────────────
+  // IMAGE
+  // ───────────────────────────────────────
+  image: {
+
+    width: '100%',
+
+    height: 160,
+
+    borderWidth: 4,
+
+    borderColor: '#69049F',
+
+    marginBottom: 10,
+  },
+
+  // ───────────────────────────────────────
+  // TITLE
+  // ───────────────────────────────────────
+  title: {
+
+    color: '#F6E6FE',
+
+    fontSize: 11,
+
+    fontWeight: '900',
+
+    letterSpacing: 2,
+
+    textTransform: 'uppercase',
+
+    minHeight: 38,
+
+    textShadowColor: '#000',
+
+    textShadowOffset: {
+      width: 3,
+      height: 3,
+    },
+
+    textShadowRadius: 0,
+  },
+
+  // ───────────────────────────────────────
+  // LINE
+  // ───────────────────────────────────────
+  line: {
+
+    width: '100%',
+
+    height: 2,
+
+    backgroundColor: '#69049F',
+
+    marginVertical: 8,
+  },
+
+  // ───────────────────────────────────────
+  // GENRE
+  // ───────────────────────────────────────
+  genre: {
+
+    color: '#C560FB',
+
+    fontSize: 8,
+
+    fontWeight: '900',
+
+    letterSpacing: 2,
+
+    textTransform: 'uppercase',
+
+    marginBottom: 8,
+  },
+
+  // ───────────────────────────────────────
+  // PRICE
+  // ───────────────────────────────────────
+  price: {
+
+    color: '#22c55e',
+
+    fontSize: 10,
+
+    fontWeight: '900',
+
+    letterSpacing: 2,
+
+    textTransform: 'uppercase',
+
+    marginBottom: 10,
+
+    textShadowColor: '#000',
+
+    textShadowOffset: {
+      width: 2,
+      height: 2,
+    },
+
+    textShadowRadius: 0,
+  },
+
+  // ───────────────────────────────────────
+  // DESCRIPTION
+  // ───────────────────────────────────────
+  description: {
+
+    color: '#F6E6FE',
+
+    fontSize: 8,
+
+    lineHeight: 16,
+
+    letterSpacing: 1,
+
+    fontWeight: '700',
+
+    textTransform: 'uppercase',
+
+    minHeight: 52,
+  },
+
+  // ───────────────────────────────────────
+  // FOOTER
+  // ───────────────────────────────────────
+  footer: {
+
+    marginTop: 12,
+
+    borderTopWidth: 2,
+
+    borderTopColor: '#69049F',
+
+    paddingTop: 8,
+  },
+
+  footerText: {
+
+    color: '#A406F9',
+
+    fontSize: 7,
+
+    fontWeight: '900',
+
+    letterSpacing: 2,
+
+    marginBottom: 4,
+  },
+
+  // ───────────────────────────────────────
+  // BUTTON CONTAINER
+  // ───────────────────────────────────────
+  buttonContainer: {
+
+    flexDirection: 'row',
+
+    marginTop: 14,
+  },
+
+  // ───────────────────────────────────────
+  // EDIT BUTTON
+  // ───────────────────────────────────────
   editButton: {
-    backgroundColor: '#2563eb',
-    padding: 12,
-    borderRadius: 12,
+
     flex: 1,
-    marginRight: 10,
+
+    backgroundColor: '#A406F9',
+
+    borderWidth: 3,
+
+    borderColor: '#000',
+
+    paddingVertical: 10,
+
+    marginRight: 6,
+
     alignItems: 'center',
+
+    shadowColor: '#000',
+
+    shadowOffset: {
+      width: 4,
+      height: 4,
+    },
+
+    shadowOpacity: 1,
+
+    shadowRadius: 0,
+
+    elevation: 8,
   },
 
+  // ───────────────────────────────────────
+  // DELETE BUTTON
+  // ───────────────────────────────────────
   deleteButton: {
-    backgroundColor: '#dc2626',
-    padding: 12,
-    borderRadius: 12,
+
     flex: 1,
+
+    backgroundColor: '#69049F',
+
+    borderWidth: 3,
+
+    borderColor: '#000',
+
+    paddingVertical: 10,
+
     alignItems: 'center',
+
+    shadowColor: '#000',
+
+    shadowOffset: {
+      width: 4,
+      height: 4,
+    },
+
+    shadowOpacity: 1,
+
+    shadowRadius: 0,
+
+    elevation: 8,
   },
 
+  // ───────────────────────────────────────
+  // BUTTON TEXT
+  // ───────────────────────────────────────
   buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+
+    color: '#F6E6FE',
+
+    fontSize: 7,
+
+    fontWeight: '900',
+
+    letterSpacing: 2,
+
+    textTransform: 'uppercase',
+
+    textShadowColor: '#000',
+
+    textShadowOffset: {
+      width: 2,
+      height: 2,
+    },
+
+    textShadowRadius: 0,
   },
 });

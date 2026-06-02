@@ -1,87 +1,89 @@
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Image,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 
-export default function GameCard({
+const { width: SW } = Dimensions.get('window');
 
-  game,
+// Ancho de cada card: mitad de pantalla menos padding lateral (18*2) y gap entre columnas (8)
+const CARD_W = (SW - 36 - 8) / 2;
 
-  role,
+const C = {
+  bg:      '#360b41',
+  surface: '#4f2c4d',
+  mid:     '#7d677e',
+  cream:   '#ccc9aa',
+  light:   '#fafdea',
+  black:   '#000000',
+  green:   '#22c55e',
+};
 
-  onEdit,
-
-  onDelete,
-
-}: any) {
-
+export default function GameCard({ game, role, onEdit, onDelete }: any) {
   return (
-
     <View style={styles.card}>
 
-      {/* IMAGEN */}
+      {/* HEADER */}
+      <View style={styles.cardHeader}>
+        <Text style={styles.p1}>◄ P1 ►</Text>
+        <View style={styles.dot} />
+        <Text style={styles.ready}>READY</Text>
+      </View>
+
+      {/* IMAGE */}
       <Image
         source={{ uri: game.image }}
         style={styles.image}
+        resizeMode="cover"
       />
 
-      {/* INFO */}
-      <Text style={styles.title}>
+      {/* TITLE */}
+      <Text numberOfLines={2} style={styles.title}>
         {game.title}
       </Text>
 
-      <Text style={styles.genre}>
-        🎮 {game.genre}
-      </Text>
+      <View style={styles.line} />
 
-      <Text style={styles.platform}>
-        🕹️ {game.platform}
-      </Text>
+      {/* GENRE */}
+      <Text numberOfLines={1} style={styles.genre}>■ {game.genre}</Text>
 
-      <Text style={styles.price}>
-        💲 {game.price}
-      </Text>
+      {/* PLATFORM */}
+      {game.platform ? (
+        <Text numberOfLines={1} style={styles.platform}>▸ {game.platform}</Text>
+      ) : null}
 
-      <Text style={styles.description}>
+      {/* PRICE */}
+      <Text style={styles.price}>▶ ${game.price}</Text>
+
+      {/* DATE */}
+      {game.date ? (
+        <Text style={styles.date}>{game.date}</Text>
+      ) : null}
+
+      {/* DESCRIPTION */}
+      <Text numberOfLines={3} style={styles.description}>
         {game.description}
       </Text>
 
-      {/* ADMIN */}
+      {/* FOOTER */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>ACCESS GRANTED</Text>
+        <Text style={styles.footerText}>LOADING...</Text>
+      </View>
+
+      {/* ADMIN BUTTONS */}
       {role === 'admin' && (
-
-        <View style={styles.buttonContainer}>
-
-          {/* EDITAR */}
-          <TouchableOpacity
-
-            style={styles.editButton}
-
-            onPress={onEdit}
-          >
-
-            <Text style={styles.buttonText}>
-              Editar
-            </Text>
-
+        <View style={styles.btnRow}>
+          <TouchableOpacity style={styles.editBtn} activeOpacity={1} onPress={onEdit}>
+            <Text style={styles.btnText}>✏ EDIT</Text>
           </TouchableOpacity>
-
-          {/* ELIMINAR */}
-          <TouchableOpacity
-
-            style={styles.deleteButton}
-
-            onPress={onDelete}
-          >
-
-            <Text style={styles.buttonText}>
-              Eliminar
-            </Text>
-
+          <TouchableOpacity style={styles.delBtn} activeOpacity={1} onPress={onDelete}>
+            <Text style={styles.btnText}>❌ DEL</Text>
           </TouchableOpacity>
-
         </View>
       )}
 
@@ -92,75 +94,125 @@ export default function GameCard({
 const styles = StyleSheet.create({
 
   card: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: 20,
-    padding: 15,
-    marginBottom: 20,
+    width: CARD_W,
+    backgroundColor: C.surface,
+    borderWidth: 4,
+    borderColor: C.mid,
+    padding: 10,
+    marginBottom: 16,
+    shadowColor: C.black,
+    shadowOffset: { width: 5, height: 5 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 10,
   },
+
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  p1:    { color: C.cream, fontFamily: 'PressStart2P-Regular', fontSize: 6, letterSpacing: 1 },
+  ready: { color: C.green, fontFamily: 'PressStart2P-Regular', fontSize: 6, letterSpacing: 1 },
+  dot:   { width: 8, height: 8, backgroundColor: C.green, borderWidth: 2, borderColor: C.black },
 
   image: {
     width: '100%',
-    height: 200,
-    borderRadius: 15,
-    marginBottom: 15,
+    height: 100,
+    borderWidth: 3,
+    borderColor: C.mid,
+    marginBottom: 8,
+    backgroundColor: C.bg,
   },
 
   title: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: 'bold',
+    color: C.light,
+    fontFamily: 'PressStart2P-Regular',
+    fontSize: 8,
+    letterSpacing: 1,
+    lineHeight: 14,
+    minHeight: 28,
+    textTransform: 'uppercase',
   },
 
+  line: { width: '100%', height: 2, backgroundColor: C.mid, marginVertical: 6 },
+
   genre: {
-    color: '#aaa',
-    marginTop: 8,
-    fontSize: 16,
+    color: C.cream,
+    fontFamily: 'PressStart2P-Regular',
+    fontSize: 7,
+    letterSpacing: 1,
+    marginBottom: 4,
   },
 
   platform: {
-    color: '#38bdf8',
-    marginTop: 8,
-    fontSize: 16,
+    color: C.mid,
+    fontFamily: 'PressStart2P-Regular',
+    fontSize: 6,
+    letterSpacing: 1,
+    marginBottom: 4,
   },
 
   price: {
-    color: '#4ade80',
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: C.green,
+    fontFamily: 'PressStart2P-Regular',
+    fontSize: 8,
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+
+  date: {
+    color: C.mid,
+    fontFamily: 'PressStart2P-Regular',
+    fontSize: 6,
+    letterSpacing: 1,
+    marginBottom: 6,
   },
 
   description: {
-    color: '#ddd',
-    marginTop: 10,
-    fontSize: 15,
+    color: C.light,
+    fontFamily: 'PressStart2P-Regular',
+    fontSize: 7,
+    lineHeight: 13,
+    minHeight: 40,
+    opacity: 0.8,
   },
 
-  buttonContainer: {
-    flexDirection: 'row',
-    marginTop: 20,
-    justifyContent: 'space-between',
+  footer: {
+    marginTop: 8,
+    borderTopWidth: 2,
+    borderTopColor: C.mid,
+    paddingTop: 6,
+  },
+  footerText: {
+    color: C.mid,
+    fontFamily: 'PressStart2P-Regular',
+    fontSize: 6,
+    letterSpacing: 1,
   },
 
-  editButton: {
-    backgroundColor: '#2563eb',
-    padding: 12,
-    borderRadius: 12,
+  btnRow: { flexDirection: 'row', marginTop: 10, gap: 6 },
+  editBtn: {
     flex: 1,
-    marginRight: 10,
+    backgroundColor: C.mid,
+    borderWidth: 3,
+    borderColor: C.black,
+    paddingVertical: 8,
     alignItems: 'center',
   },
-
-  deleteButton: {
-    backgroundColor: '#dc2626',
-    padding: 12,
-    borderRadius: 12,
+  delBtn: {
     flex: 1,
+    backgroundColor: C.bg,
+    borderWidth: 3,
+    borderColor: C.mid,
+    paddingVertical: 8,
     alignItems: 'center',
   },
-
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+  btnText: {
+    color: C.light,
+    fontFamily: 'PressStart2P-Regular',
+    fontSize: 6,
+    letterSpacing: 1,
   },
 });

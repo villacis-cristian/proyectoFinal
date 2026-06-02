@@ -10,8 +10,8 @@ import { auth } from "../services/firebaseConfig";
 import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 
-// HOME
-import HomeScreen from "../screens/HomeScreen";
+// 🔥 IMPORTANTE: usar Drawer
+import DrawerNavigator from "./DrawerNavigator";
 
 // MOVIES
 import MoviesScreen from "../screens/crudMovies/MoviesScreen";
@@ -34,7 +34,6 @@ export default function AppNavigator() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔥 DETECTAR SESIÓN (IMPORTANTE)
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -44,7 +43,6 @@ export default function AppNavigator() {
     return unsubscribe;
   }, []);
 
-  // ⏳ ESPERAR A QUE CARGUE
   if (loading) return null;
 
   return (
@@ -58,71 +56,38 @@ export default function AppNavigator() {
           contentStyle: {
             backgroundColor: "#121212",
           },
+          headerShown: false, // mejor para drawer
         }}
       >
         {user ? (
           <>
-            {/* HOME */}
-            <Stack.Screen name="Home" component={HomeScreen} />
+            {/* 🔥 AQUI VA EL SIDEBAR */}
+            <Stack.Screen name="Main" component={DrawerNavigator} />
 
-            {/* MOVIES */}
-            <Stack.Screen
-              name="Movies"
-              component={MoviesScreen}
-              options={{ title: "Películas" }}
-            />
+            {/* DEMÁS PANTALLAS */}
+            <Stack.Screen name="Movies" component={MoviesScreen} />
+            <Stack.Screen name="AddMovie" component={AddMovieScreen} />
+            <Stack.Screen name="EditMovie" component={EditMovieScreen} />
 
-            <Stack.Screen
-              name="AddMovie"
-              component={AddMovieScreen}
-              options={{ title: "Agregar Película" }}
-            />
+            <Stack.Screen name="Games" component={GamesScreen} />
+            <Stack.Screen name="AddGame" component={AddGameScreen} />
+            <Stack.Screen name="EditGame" component={EditGameScreen} />
 
-            <Stack.Screen
-              name="EditMovie"
-              component={EditMovieScreen}
-              options={{ title: "Editar Película" }}
-            />
-
-            {/* GAMES */}
-            <Stack.Screen
-              name="Games"
-              component={GamesScreen}
-              options={{ title: "Videojuegos" }}
-            />
-
-            <Stack.Screen
-              name="AddGame"
-              component={AddGameScreen}
-              options={{ title: "Agregar Juego" }}
-            />
-
-            <Stack.Screen
-              name="EditGame"
-              component={EditGameScreen}
-              options={{ title: "Editar Juego" }}
-            />
-
-            {/* DETAIL */}
             <Stack.Screen name="Detail" component={DetailScreen} />
-
-            {/* BUY */}
             <Stack.Screen name="Buy" component={BuyScreen} />
 
-            {/* PROFILE */}
             <Stack.Screen name="Profile" component={ProfileScreen} />
           </>
         ) : (
           <>
-            {/* LOGIN */}
             <Stack.Screen
               name="Login"
               component={LoginScreen}
-              options={{ headerShown: false }}
             />
-
-            {/* REGISTER */}
-            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen
+              name="Register"
+              component={RegisterScreen}
+            />
           </>
         )}
       </Stack.Navigator>

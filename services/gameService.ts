@@ -7,36 +7,35 @@ import {
   doc,
 } from 'firebase/firestore';
 
-import { db }
-from './firebaseConfig';
+import { db } from './firebaseConfig';
 
+// ───────────────────────────
 // OBTENER JUEGOS
-export const getGames =
-async () => {
+// ───────────────────────────
+export const getGames = async () => {
 
-  const querySnapshot =
-    await getDocs(
-      collection(db, 'games')
-    );
+  const querySnapshot = await getDocs(
+    collection(db, 'games')
+  );
 
-  const games: any = [];
+  const games: any[] = [];
 
   querySnapshot.forEach((document) => {
 
     games.push({
-
       id: document.id,
-
       ...document.data(),
     });
+
   });
 
   return games;
 };
 
-// AGREGAR
-export const addGame =
-async (game: any) => {
+// ───────────────────────────
+// AGREGAR JUEGO
+// ───────────────────────────
+export const addGame = async (game: any) => {
 
   await addDoc(
     collection(db, 'games'),
@@ -44,9 +43,10 @@ async (game: any) => {
   );
 };
 
-// EDITAR
-export const editGame =
-async (
+// ───────────────────────────
+// EDITAR JUEGO
+// ───────────────────────────
+export const editGame = async (
   id: string,
   game: any
 ) => {
@@ -57,9 +57,10 @@ async (
   );
 };
 
-// ELIMINAR
-export const deleteGame =
-async (id: string) => {
+// ───────────────────────────
+// ELIMINAR JUEGO
+// ───────────────────────────
+export const deleteGame = async (id: string) => {
 
   await deleteDoc(
     doc(db, 'games', id)

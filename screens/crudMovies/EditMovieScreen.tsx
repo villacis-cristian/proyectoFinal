@@ -1,298 +1,285 @@
+import React, { useState, useRef } from 'react';
 import {
   View,
- Text,
+  Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
- Alert,
+  Alert,
   Image,
+  Animated,
+  StatusBar,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { editMovie } from '../../services/movieService';
 
-import { useState }
-from 'react';
+// ─────────────────────────────────────────
+// PALETA
+// ─────────────────────────────────────────
+const C = {
+  bg:       '#150018',
+  surface:  '#240e28',
+  mid:      '#331d37',
+  accent:   '#422b47',
+  muted:    '#513957',
+  gray1:    '#2a2a2d',
+  gray3:    '#6b6b72',
+  white:    '#f0eef2',
+  offwhite: '#c9c6cd',
+  green:    '#22c55e',
+  primary:  '#a406f9',
+  dark:     '#69049f',
+  accentLt: '#c560fb',
+  red:      '#e53e3e',
+};
 
-import * as ImagePicker
-from 'expo-image-picker';
+// ─────────────────────────────────────────
+// EDIT MOVIE SCREEN
+// ─────────────────────────────────────────
+export default function EditMovieScreen({ navigation, route }: any) {
+  const movie = route.params?.movie;
 
-import {
-  editMovie,
-} from '../../services/movieService';
+  const [title, setTitle]           = useState(movie.title);
+  const [description, setDescription] = useState(movie.description);
+  const [genre, setGenre]           = useState(movie.genre);
+  const [price, setPrice]           = useState(String(movie.price));
+  const [image, setImage]           = useState(movie.image);
 
-export default function EditMovieScreen({
-  navigation,
-  route,
-}: any) {
+  const [titleFocus, setTitleFocus]           = useState(false);
+  const [descFocus, setDescFocus]             = useState(false);
+  const [genreFocus, setGenreFocus]           = useState(false);
+  const [priceFocus, setPriceFocus]           = useState(false);
 
-  // DATOS RECIBIDOS
-  const movie =
-    route.params?.movie;
+  const btnTranslate = useRef(new Animated.Value(0)).current;
+  const pressAnim = (toValue: number) =>
+    Animated.timing(btnTranslate, { toValue, duration: 60, useNativeDriver: true }).start();
 
-  // ESTADOS
-  const [title, setTitle] =
-    useState(movie.title);
-
-  const [
-    description,
-    setDescription,
-  ] = useState(
-    movie.description
-  );
-
-  const [genre, setGenre] =
-    useState(movie.genre);
-
-  const [price, setPrice] =
-    useState(
-      String(movie.price)
-    );
-
-  const [image, setImage] =
-    useState(movie.image);
-
-  // SELECCIONAR IMAGEN
   const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [16, 9],
+      quality: 1,
+    });
+    if (!result.canceled) setImage(result.assets[0].uri);
+  };
 
-    const result =
-      await ImagePicker.launchImageLibraryAsync({
-
-        mediaTypes:
-          ImagePicker.MediaTypeOptions.Images,
-
-        allowsEditing: true,
-
-        aspect: [16, 9],
-
-        quality: 1,
-      });
-
-    if (!result.canceled) {
-
-      setImage(
-        result.assets[0].uri
-      );
+  const handleEditMovie = async () => {
+    if (!title || !description || !genre || !price || !image) {
+      Alert.alert('ERROR', 'COMPLETE ALL FIELDS');
+      return;
+    }
+    try {
+      await editMovie(movie.id, { title, description, genre, price: Number(price), image });
+      Alert.alert('SYSTEM READY', 'MOVIE UPDATED');
+      navigation.goBack();
+    } catch (error: any) {
+      Alert.alert('ERROR', error.message);
     }
   };
 
-  // ACTUALIZAR
-  const handleEditMovie =
-    async () => {
-
-      if (
-        !title ||
-        !description ||
-        !genre ||
-        !price ||
-        !image
-      ) {
-
-        Alert.alert(
-          'Error',
-          'Completa todos los campos'
-        );
-
-        return;
-      }
-
-      try {
-
-        await editMovie(
-
-          movie.id,
-
-          {
-            title,
-
-            description,
-
-            genre,
-
-            price:
-              Number(price),
-
-            image,
-          }
-        );
-
-        Alert.alert(
-          'Éxito',
-          'Película actualizada'
-        );
-
-        navigation.goBack();
-
-      } catch (error: any) {
-
-        Alert.alert(
-          'Error',
-          error.message
-        );
-      }
-    };
-
   return (
+    <View style={styles.mainContainer}>
+      <StatusBar barStyle="light-content" backgroundColor={C.bg} />
 
-    <ScrollView style={styles.container}>
+      {/* ── TITLE BAR ── */}
+      <View style={styles.titleBar}>
+        <View style={styles.titleDots}>
+          <View style={[styles.dot, { backgroundColor: C.red     }]} />
+          <View style={[styles.dot, { backgroundColor: '#d97706' }]} />
+          <View style={[styles.dot, { backgroundColor: C.green   }]} />
+        </View>
+        <Text style={styles.titleBarText}>AVASHI'KOL · EDIT_MOVIE.EXE</Text>
+        <View style={{ width: 48 }} />
+      </View>
+      <View style={styles.divider} />
 
-      <Text style={styles.title}>
-        ✏️ Editar Película
-      </Text>
+      <ScrollView contentContainerStyle={styles.container}>
 
-      {/* IMAGEN */}
-      <TouchableOpacity
-
-        style={styles.imageButton}
-
-        onPress={pickImage}
-      >
-
-        {image ? (
-
-          <Image
-            source={{ uri: image }}
-            style={styles.image}
-          />
-
-        ) : (
-
-          <Text style={styles.imageText}>
-            Seleccionar Imagen
+        {/* ── PROMPT ── */}
+        <View style={styles.promptBlock}>
+          <Text style={styles.promptLine}>
+            <Text style={styles.promptGreen}>system</Text>
+            <Text style={styles.promptMuted}>@avashi</Text>
+            <Text style={styles.promptWhite}> ~ % </Text>
+            <Text style={styles.promptAccent}>movie --edit</Text>
           </Text>
-        )}
+          <Text style={styles.promptComment}>{`// modifica los datos de la película`}</Text>
+        </View>
 
-      </TouchableOpacity>
+        {/* ── SECTION TITLE ── */}
+        <View style={styles.sectionRow}>
+          <View style={styles.sectionLine} />
+          <Text style={styles.sectionLabel}>■ EDIT MOVIE ■</Text>
+          <View style={styles.sectionLine} />
+        </View>
 
-      {/* TÍTULO */}
-      <TextInput
-        style={styles.input}
-        placeholder='Título'
-        placeholderTextColor='#888'
-        value={title}
-        onChangeText={setTitle}
-      />
+        {/* ── IMAGE PICKER ── */}
+        <TouchableOpacity style={styles.imageButton} onPress={pickImage} activeOpacity={0.85}>
+          {image ? (
+            <Image source={{ uri: image }} style={styles.image} />
+          ) : (
+            <View style={styles.imagePlaceholder}>
+              <Text style={styles.imageIcon}>🎬</Text>
+              <Text style={styles.imageText}>▸ SELECT IMAGE</Text>
+            </View>
+          )}
+          <View style={styles.imageOverlay}>
+            <Text style={styles.imageOverlayText}>▶ CHANGE</Text>
+          </View>
+        </TouchableOpacity>
 
-      {/* DESCRIPCIÓN */}
-      <TextInput
+        {/* ── FIELDS ── */}
+        {[
+          { label: '▸ TITLE',       value: title,       setter: setTitle,       focus: titleFocus, setFocus: setTitleFocus, placeholder: 'MOVIE TITLE',   multi: false, numeric: false },
+          { label: '▸ DESCRIPTION', value: description, setter: setDescription, focus: descFocus,  setFocus: setDescFocus,  placeholder: 'MOVIE DESC...',  multi: true,  numeric: false },
+          { label: '▸ GENRE',       value: genre,       setter: setGenre,       focus: genreFocus, setFocus: setGenreFocus, placeholder: 'GENRE',          multi: false, numeric: false },
+          { label: '▸ PRICE',       value: price,       setter: setPrice,       focus: priceFocus, setFocus: setPriceFocus, placeholder: '0.00',           multi: false, numeric: true  },
+        ].map((field) => (
+          <View key={field.label} style={styles.fieldWrap}>
+            <Text style={styles.label}>{field.label}</Text>
+            <TextInput
+              style={[styles.input, field.focus && styles.inputFocus, field.multi && styles.textArea]}
+              placeholder={field.placeholder}
+              placeholderTextColor={C.muted}
+              value={field.value}
+              onChangeText={field.setter}
+              multiline={field.multi}
+              keyboardType={field.numeric ? 'numeric' : 'default'}
+              onFocus={() => field.setFocus(true)}
+              onBlur={() => field.setFocus(false)}
+            />
+          </View>
+        ))}
 
-        style={[
-          styles.input,
-          styles.textArea,
-        ]}
+        {/* ── SAVE BUTTON ── */}
+        <Animated.View style={[styles.btnWrap, { transform: [{ translateX: btnTranslate }, { translateY: btnTranslate }] }]}>
+          <TouchableOpacity
+            style={styles.button}
+            activeOpacity={1}
+            onPressIn={() => pressAnim(3)}
+            onPressOut={() => pressAnim(0)}
+            onPress={handleEditMovie}
+          >
+            <Text style={styles.buttonText}>▶ SAVE CHANGES</Text>
+          </TouchableOpacity>
+        </Animated.View>
 
-        placeholder='Descripción'
+        {/* ── BACK ── */}
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.75}>
+          <Text style={styles.backText}>◄ CANCEL</Text>
+        </TouchableOpacity>
 
-        placeholderTextColor='#888'
-
-        multiline
-
-        value={description}
-
-        onChangeText={
-          setDescription
-        }
-      />
-
-      {/* GÉNERO */}
-      <TextInput
-        style={styles.input}
-        placeholder='Género'
-        placeholderTextColor='#888'
-        value={genre}
-        onChangeText={setGenre}
-      />
-
-      {/* PRECIO */}
-      <TextInput
-        style={styles.input}
-        placeholder='Precio'
-        placeholderTextColor='#888'
-        keyboardType='numeric'
-        value={price}
-        onChangeText={setPrice}
-      />
-
-      {/* BOTÓN */}
-      <TouchableOpacity
-
-        style={styles.button}
-
-        onPress={
-          handleEditMovie
-        }
-      >
-
-        <Text style={styles.buttonText}>
-          Guardar Cambios
-        </Text>
-
-      </TouchableOpacity>
-
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
+// ─────────────────────────────────────────
+// STYLES
+// ─────────────────────────────────────────
 const styles = StyleSheet.create({
+  mainContainer: { flex: 1, backgroundColor: C.bg },
 
-  container: {
-    flex: 1,
-    backgroundColor: '#121212',
-    padding: 20,
+  titleBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: C.mid,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginTop: 50,
   },
+  titleDots:    { flexDirection: 'row', gap: 6 },
+  dot:          { width: 10, height: 10, borderRadius: 5 },
+  titleBarText: { color: C.offwhite, fontFamily: 'PressStart2P-Regular', fontSize: 7, letterSpacing: 1 },
+  divider:      { height: 1, backgroundColor: C.accent },
 
-  title: {
-    color: '#fff',
-    fontSize: 30,
-    fontWeight: 'bold',
-    marginTop: 40,
-    marginBottom: 30,
-    textAlign: 'center',
+  container: { padding: 16, paddingBottom: 60 },
+
+  promptBlock: {
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    backgroundColor: C.gray1,
+    borderWidth: 1,
+    borderColor: C.accent,
+    marginBottom: 16,
   },
+  promptLine:    { flexDirection: 'row', flexWrap: 'wrap', marginBottom: 4 },
+  promptGreen:   { color: C.green,    fontFamily: 'PressStart2P-Regular', fontSize: 7 },
+  promptMuted:   { color: C.muted,    fontFamily: 'PressStart2P-Regular', fontSize: 7 },
+  promptWhite:   { color: C.offwhite, fontFamily: 'PressStart2P-Regular', fontSize: 7 },
+  promptAccent:  { color: C.accentLt, fontFamily: 'PressStart2P-Regular', fontSize: 7 },
+  promptComment: { color: C.gray3,    fontFamily: 'PressStart2P-Regular', fontSize: 6, letterSpacing: 0.5 },
+
+  sectionRow:   { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 },
+  sectionLine:  { flex: 1, height: 1, backgroundColor: C.accent },
+  sectionLabel: { color: C.offwhite, fontFamily: 'PressStart2P-Regular', fontSize: 8, letterSpacing: 2 },
 
   imageButton: {
-    backgroundColor: '#1e1e1e',
-    height: 220,
-    borderRadius: 18,
+    backgroundColor: C.surface,
+    height: 180,
+    borderWidth: 1,
+    borderColor: C.accent,
+    marginBottom: 20,
+    overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 25,
-    overflow: 'hidden',
+    position: 'relative',
   },
-
-  image: {
-    width: '100%',
-    height: '100%',
-  },
-
-  imageText: {
-    color: '#aaa',
-    fontSize: 18,
-  },
-
-  input: {
-    backgroundColor: '#1e1e1e',
-    color: '#fff',
-    padding: 16,
-    borderRadius: 14,
-    marginBottom: 20,
-    fontSize: 16,
-  },
-
-  textArea: {
-    height: 120,
-    textAlignVertical: 'top',
-  },
-
-  button: {
-    backgroundColor: '#7c3aed',
-    padding: 18,
-    borderRadius: 14,
+  image:        { width: '100%', height: '100%' },
+  imagePlaceholder: { alignItems: 'center', gap: 10 },
+  imageIcon:    { fontSize: 32 },
+  imageText:    { color: C.muted, fontFamily: 'PressStart2P-Regular', fontSize: 8, letterSpacing: 2 },
+  imageOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: C.mid,
+    paddingVertical: 6,
     alignItems: 'center',
-    marginBottom: 40,
   },
+  imageOverlayText: { color: C.green, fontFamily: 'PressStart2P-Regular', fontSize: 7, letterSpacing: 2 },
 
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+  fieldWrap: { marginBottom: 14 },
+  label: {
+    color: C.offwhite,
+    fontFamily: 'PressStart2P-Regular',
+    fontSize: 7,
+    letterSpacing: 1,
+    marginBottom: 6,
   },
+  input: {
+    backgroundColor: C.mid,
+    color: C.white,
+    fontFamily: 'PressStart2P-Regular',
+    fontSize: 8,
+    letterSpacing: 2,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: C.accent,
+  },
+  inputFocus: { borderColor: C.accentLt, backgroundColor: C.accent },
+  textArea:   { height: 100, textAlignVertical: 'top' },
+
+  btnWrap: { marginTop: 8, marginBottom: 12 },
+  button: {
+    backgroundColor: C.primary,
+    borderWidth: 1,
+    borderColor: C.accentLt,
+    paddingVertical: 14,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 3, height: 3 },
+    shadowOpacity: 0.6,
+    shadowRadius: 0,
+    elevation: 6,
+  },
+  buttonText: { color: C.white, fontFamily: 'PressStart2P-Regular', fontSize: 10, letterSpacing: 3 },
+
+  backBtn:  { alignItems: 'center', paddingVertical: 12 },
+  backText: { color: C.muted, fontFamily: 'PressStart2P-Regular', fontSize: 8, letterSpacing: 2 },
 });

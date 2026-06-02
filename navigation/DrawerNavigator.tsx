@@ -1,10 +1,12 @@
 import React from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import HomeScreen from "../../screens/HomeScreen";
-import ProfileScreen from "../../screens/ProfileScreen";
 
+// SCREENS
+import HomeScreen from "../screens/HomeScreen";
+import ProfileScreen from "../screens/ProfileScreen";
+
+// CUSTOM
 import CustomDrawer from "./CustomDrawer";
-
 const Drawer = createDrawerNavigator();
 
 export default function DrawerNavigator() {
@@ -14,6 +16,7 @@ export default function DrawerNavigator() {
       screenOptions={{
         headerStyle: { backgroundColor: "#0f172a" },
         headerTintColor: "#fff",
+        drawerType: "slide", // 🔥 CLAVE
       }}
     >
       <Drawer.Screen name="Home" component={HomeScreen} />
